@@ -6,6 +6,8 @@ import com.stage.security.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ public class AuthenticationService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
+
 
   public AuthenticationResponse register(RegisterRequest request) {
     var user = User.builder()
@@ -56,5 +59,39 @@ public class AuthenticationService {
     return AuthenticationResponse.builder()
         .token(jwtToken)
         .build();
+  }
+  public AuthenticationResponse updateUser(RegisterRequest request) {
+    String email = request.getEmail();
+    User user = repository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
+
+    // Update user information based on the request
+    user.setNomentreprise(request.getNomentreprise());
+    user.setNuminscription(request.getNuminscription());
+    user.setNumidentifiant(request.getNumidentifiant());
+    user.setTypesoumissionnaire(request.getTypesoumissionnaire());
+    user.setPays(request.getPays());
+    user.setTypedemarche(request.getTypedemarche());
+    user.setNumtel(request.getNumtel());
+    user.setNumfax(request.getNumfax());
+    user.setEmailsociete(request.getEmailsociete());
+    user.setNom(request.getNom());
+    user.setTitre(request.getTitre());
+    user.setTelephone(request.getTelephone());
+    user.setNumerodebureau(request.getNumerodebureau());
+
+    // Update other fields
+
+    repository.save(user);
+
+    // You can return an appropriate response here
+    // For example, a success message or a new AuthenticationResponse
+
+
+
+    // Generate token and create response
+    String jwtToken = jwtService.generateToken(user);
+    return AuthenticationResponse.builder()
+            .token(jwtToken)
+            .build();
   }
 }

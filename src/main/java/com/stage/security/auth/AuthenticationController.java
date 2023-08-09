@@ -2,6 +2,7 @@ package com.stage.security.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,14 @@ public class AuthenticationController {
       @RequestBody AuthenticationRequest request
   ) {
     return ResponseEntity.ok(service.authenticate(request));
+  }
+  @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+  @PutMapping("/update")
+  public ResponseEntity<AuthenticationResponse> update(
+          @RequestBody RegisterRequest request,
+          AuthenticationRequest authentication
+  ) {
+    return ResponseEntity.ok(service.updateUser(request));
   }
 
  /* @GetMapping(value = "confirm")
