@@ -1,5 +1,7 @@
 package com.stage.security.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.stage.security.token.Token;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -57,12 +59,16 @@ public class User implements UserDetails {
 
   @Enumerated(EnumType.STRING)
   private Role role;
+  @OneToMany(mappedBy = "user"  ,cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
+  private List<Token> tokens;
+
   private Boolean locked=false;
   private Boolean enabled=false;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority(role.name()));
+    return role.getAuthorities();
   }
 
   @Override

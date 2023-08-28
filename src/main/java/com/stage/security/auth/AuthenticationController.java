@@ -1,9 +1,13 @@
 package com.stage.security.auth;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -25,13 +29,19 @@ public class AuthenticationController {
   ) {
     return ResponseEntity.ok(service.authenticate(request));
   }
-  @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
   @PutMapping("/update")
   public ResponseEntity<AuthenticationResponse> update(
           @RequestBody RegisterRequest request,
           AuthenticationRequest authentication
   ) {
     return ResponseEntity.ok(service.updateUser(request));
+  }
+  @PostMapping("/refresh-token")
+  public void refreshToken(
+          HttpServletRequest request,
+          HttpServletResponse response
+  ) throws IOException {
+    service.refreshToken(request, response);
   }
 
  /* @GetMapping(value = "confirm")
